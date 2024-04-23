@@ -29,7 +29,7 @@ router.get('/send-notification', async (req, res) => {
 	const notifications = subscriptions.map((subscription) =>
 		webpush.sendNotification(
 			subscription,
-			'A message from /send-notification endpoint.'
+			"Poultry '/send-notification' endpoint."
 		)
 	);
 
