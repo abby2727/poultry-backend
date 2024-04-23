@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Humidity = require('../models/humidityModel');
+const Subscription = require('../models/subscriptionModel');
 const moment = require('moment-timezone');
+const webpush = require('web-push');
 
 router.get('/', async (req, res) => {
 	try {
@@ -28,6 +30,33 @@ router.post('/', async (req, res) => {
 	try {
 		const { value } = req.body;
 		if (!value) res.status(400).json({ message: 'Please provide a value' });
+
+		//* Send notification if humidity level is above 70
+		if (value > 70) {
+			console.log('Humidity level is above normal.');
+
+			const dateAndTime = moment()
+				.tz('Asia/Manila')
+				.format('MMMM Do YYYY, h:mm a');
+			const message = `The humidity level exceeds the normal range. Date and time of this occurrence: ${dateAndTime}.`;
+
+			const subscriptions = await Subscription.find();
+			const notifications = subscriptions.map(async (subscription) => {
+				try {
+					await webpush.sendNotification(subscription, message);
+				} catch (err) {
+					if (err.statusCode === 410 || err.statusCode === 404) {
+						// The push subscription was not found or has expired.
+						// Remove the subscription from the database.
+						await Subscription.deleteOne({ _id: subscription._id });
+					} else {
+						console.error('Failed to send notification', err);
+					}
+				}
+			});
+
+			await Promise.all(notifications);
+		}
 
 		const humidity = await Humidity.create({ value });
 		res.status(201).json(humidity);
