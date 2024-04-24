@@ -18,11 +18,13 @@ const humidityRouter = require('./routes/humidity');
 const temperatureRouter = require('./routes/temperature');
 const ammoniaRouter = require('./routes/ammonia');
 const subscriptionRouter = require('./routes/subscription');
+const eggCounterRouter = require('./routes/eggCounter');
 
 app.use('/api/humidity', humidityRouter);
 app.use('/api/temperature', temperatureRouter);
 app.use('/api/ammonia', ammoniaRouter);
 app.use('/api', subscriptionRouter);
+app.use('/api/egg-counter', eggCounterRouter);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
