@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const EggCounter = require('../models/eggCounterModel');
 const moment = require('moment-timezone');
+const authenticateToken = require('../middleware/authMiddleware');
 
 router.get('/', async (req, res) => {
 	try {
@@ -24,7 +25,7 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
 	try {
 		const { value } = req.body;
 		if (!value) res.status(400).json({ message: 'Please provide a value' });

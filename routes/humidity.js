@@ -4,6 +4,7 @@ const Humidity = require('../models/humidityModel');
 const Subscription = require('../models/subscriptionModel');
 const moment = require('moment-timezone');
 const webpush = require('web-push');
+const authenticateToken = require('../middleware/authMiddleware');
 
 router.get('/', async (req, res) => {
 	try {
@@ -26,7 +27,7 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
 	try {
 		const { value } = req.body;
 		if (!value) res.status(400).json({ message: 'Please provide a value' });
